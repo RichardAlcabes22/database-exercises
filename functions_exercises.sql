@@ -210,7 +210,7 @@ WHERE to_date = '9999-01-01';
 
 -- 6. generate username fllll_mmyy example ralca_0275
 SELECT first_name,last_name,birth_date, CONCAT(LOWER(SUBSTR(first_name,1,1)),
-											   LOWER(SUBSTR(last_name,1,4)),
+					       LOWER(SUBSTR(last_name,1,4)),
                                                '_',
                                                SUBSTR(birth_date,6,2),
                                                SUBSTR(birth_date,3,2)
