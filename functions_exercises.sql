@@ -205,7 +205,8 @@ SELECT first_name, last_name, CONCAT(first_name, ' ',last_name) AS full_name
           
 -- 5. smallest and largest salaries from 'salary' table
 SELECT MIN(salary), MAX(salary)
-FROM salaries;
+FROM salaries
+WHERE to_date = '9999-01-01';
 
 -- 6. generate username fllll_mmyy example ralca_0275
 SELECT first_name,last_name,birth_date, CONCAT(LOWER(SUBSTR(first_name,1,1)),
