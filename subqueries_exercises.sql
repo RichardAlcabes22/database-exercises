@@ -90,7 +90,7 @@ WHERE salary > (SELECT AVG(salary)
 ;
 
 -- 6. CURRENT salaries within 1 SD of CURRENT highest salary
-
+/*
 -- COUNT of all current salaries, MAX, STD
 SELECT COUNT(salary), MAX(salary), ROUND(STD(salary))
 FROM salaries
@@ -101,6 +101,7 @@ SELECT MAX(salary) - ROUND(STD(salary)) AS max_1sd
 FROM salaries
 WHERE to_date > CURDATE();
 
+*/
 SELECT COUNT(salary)
 FROM salaries
 WHERE to_date > CURDATE()
@@ -110,3 +111,69 @@ WHERE to_date > CURDATE()
 			 WHERE to_date > CURDATE()
              )
 ; -- 83 CURRENT salaries are within 1 SD of MAX CURRENT salary
+
+
+-- BONUS
+-- B1 all Dept names with CURRENT Female managers
+SELECT mgrlist.dept_name
+FROM	(	SELECT d.dept_name, CONCAT(e.first_name,' ',e.last_name) AS Dept_Mgr, e.gender
+			FROM departments AS d
+			  JOIN dept_manager as dm
+			  ON d.dept_no = dm.dept_no
+				JOIN employees as e
+				ON dm.emp_no = e.emp_no
+			WHERE dm.to_date > CURDATE()
+			GROUP BY d.dept_name,dm.emp_no
+		) AS mgrlist
+WHERE mgrlist.gender = 'F';
+
+-- B2 First and Last Name of employee with highest salary
+-- Subquery to create a derived_table
+/*
+SELECT e.first_name, e.last_name, s.salary
+FROM employees AS e
+      JOIN salaries AS s
+      ON e.emp_no = s.emp_no
+WHERE s.to_date > CURDATE()
+ORDER BY s.salary DESC
+LIMIT 10;
+
+*/
+
+SELECT t.first_name, t.last_name, t.salary
+FROM 	(SELECT e.first_name, e.last_name
+		 FROM employees AS e
+		  JOIN salaries AS s
+		  ON e.emp_no = s.emp_no
+		 WHERE s.to_date > CURDATE()
+		 ORDER BY s.salary DESC
+		 LIMIT 10
+        ) AS t
+WHERE t.salary = (  SELECT MAX(s.salary)
+					FROM salaries AS s
+					WHERE s.to_date > CURDATE()
+					
+                    )
+;
+
+-- B3 Find deptname that emp w/ highest salary works in
+
+SELECT t.first_name, t.last_name, d.dept_name
+FROM 	(SELECT e.first_name, e.last_name, e.emp_no,s.salary
+		 FROM employees AS e
+		  JOIN salaries AS s
+		  ON e.emp_no = s.emp_no
+		 WHERE s.to_date > CURDATE()
+		 ORDER BY s.salary DESC
+		 LIMIT 10
+        ) AS t
+	JOIN dept_emp de
+    ON t.emp_no = de.emp_no
+      JOIN departments d
+      ON de.dept_no = d.dept_no
+WHERE t.salary = (  SELECT MAX(s.salary)
+					FROM salaries AS s
+					WHERE s.to_date > CURDATE()
+					
+                    )
+;
